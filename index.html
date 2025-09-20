@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Password Fetcher</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: white;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      width: 360px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    input[type="email"] {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+    .radio-group {
+      margin: 15px 0;
+      text-align: left;
+      padding-left: 20px;
+    }
+    .radio-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #00c6ff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0072ff;
+    }
+    #resultBox {
+      margin-top: 20px;
+      padding: 12px;
+      display: none;
+      background: white;
+      color: black;
+      border-radius: 6px;
+      font-weight: bold;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Password Fetcher</h2>
+    <input type="email" id="email" placeholder="Enter your email" />
+
+    <div class="radio-group">
+      <label><input type="radio" name="account" value="SAP" onclick="selectAccount('SAP')"> SAP</label>
+      <label><input type="radio" name="account" value="Gmail" onclick="selectAccount('Gmail')"> Gmail</label>
+    </div>
+
+    <button onclick="generatePassword()">Get Password</button>
+
+    <div id="resultBox"></div>
+  </div>
+
+  <script>
+    let selectedAccount = null;
+
+    function selectAccount(account) {
+      selectedAccount = account;
+    }
+
+    function generatePassword() {
+      const email = document.getElementById("email").value.trim();
+
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        alert("Please enter a valid Email ID.");
+        return;
+      }
+      if (!selectedAccount) {
+        alert("Please select SAP or Gmail first.");
+        return;
+      }
+
+      // 🔹 Your Web App URL (must be deployed with "Anyone with link" access)
+      const scriptURL = "https://script.google.com/macros/s/AKfycbzmsJTPaCGBSOqU5me9FArp6y2NyOMuwaimMTeon1ZcOPaA25r8zJTI8cNByD7TH6yYcA/exec";
+
+      // Use FormData instead of JSON
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("account", selectedAccount);
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Server Response:", data);
+        const resultBox = document.getElementById("resultBox");
+        resultBox.style.display = "block";
+        resultBox.textContent = data.message || "No response from server.";
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        alert("⚠️ Something went wrong!\n" + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
